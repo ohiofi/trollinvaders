@@ -30,14 +30,14 @@ String.prototype.getBytes=function(){for(var e=[],n=0;n<this.length;n++){var t=t
   <source src="Troll_Invaders_Theme.mp3" type="audio/mpeg"> Your browser does not support the audio element.
 </audio>
     <script>
-      function playBgMusic(playOrPause){
-        if(playOrPause){
+      function playBgMusic(){
+        if(!muted){
           document.getElementById('audioPlayer').play();
         }else{
           document.getElementById('audioPlayer').pause();
         }
       }
-      document.addEventListener('keyup', ()=>{playBgMusic(!muted)});  
-      document.addEventListener("click", ()=>{playBgMusic(!muted)});
+      document.addEventListener('keyup', ()=>{playBgMusic()});  
+      document.addEventListener("click", ()=>{playBgMusic()});
     </script>
     </body></html>
