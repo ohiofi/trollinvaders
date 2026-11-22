@@ -30,6 +30,35 @@ blackExit3
 blackExit4
 #888888
 
+isBossAlive
+transparent
+
+BossBL 
+#dd6005 #027F03 #413204 #c81313 #ee51aa
+..311
+.1131
+.2422
+.4340
+32403
+02000
+00232
+00222
+..30.
+.000.
+
+BossBR 
+#dd6005 #027F03 #413204 #c81313 #ee51aa
+13...
+311..
+242..
+434..
+0423.
+0020.
+3200.
+2200.
+03...
+000..
+
 brick
 red darkred
 00010
@@ -744,6 +773,14 @@ notBoat = PlayerEmpty or PlayerWithSword
 wall = brick or wood or stone or redbrick
 floor = floorTile or tanFloor or grayFloor or floorTile2
 Enemy = EnemyUp or EnemyDown or EnemyLeft or EnemyRight
+EnemyObstacle = wall or key or lock or sword or water or pond or BossBL or BossBR
+BossObstacle = wall or key or lock or sword or water or pond or enemy or player
+
+Š = floorTile2 and BossBL
+‹ = floorTile2 and BossBR
+
+Boss = BossBL or BossBR
+
 
 ! = dock
 " = sandC
@@ -766,6 +803,7 @@ $ = sandL
 : = town1
 ; = town2
 ? = EnemyDown
+… = floorTile2 and EnemyDown
 @ = sand
 _ = pondSW
 ` = grassR
@@ -820,6 +858,7 @@ Lock destroy 76535100
 Player CantMove 69279104
 (Player Move 76402304)
 Player Move 74215507
+Boss Move 62086502
 ShowMessage 61224106
 Startlevel 22711100
 Sword destroy 60339300
@@ -835,7 +874,9 @@ Background
 
 water, dock, sand, sandL, sandR, sandC, sandSW, sandSE, grass, grassL,  grassR, floor, letter,  exit, mountainNE, mountainNW, mountainSW, mountainSE, doorway
 
-Player, wall, propBoat, Sword, Enemy, Villager, BloodEnemy, pond, tree, lock, key
+Player, wall, propBoat, Sword, Enemy, Villager, BloodEnemy, pond, tree, lock, key, boss
+
+isBossAlive
 
 dark
 
@@ -852,22 +893,63 @@ RULES
 [ > Player | Key ] -> [ > Player | > Key ]
 
 ( 1\. Line of Sight: If Player moves and Enemy has clear sight, turn Enemy towards Player ) 
-[ Enemy | ... | no Wall | ... | moving Player ] -> [ > Enemy | ... | no Wall | ... | moving Player ] Sfx3
-
-( 1\. Turn Enemy clockwise if blocked by a Wall in front ) 
-left [ EnemyLeft | Wall ] -> [ EnemyUp | Wall ] 
-down [ EnemyDown | Wall ] -> [ EnemyLeft | Wall ] 
-right [ EnemyRight | Wall ] -> [ EnemyDown | Wall ] 
-up [ EnemyUp | Wall ] -> [ EnemyRight | Wall ] 
-( 2\. Advance Enemy in its active direction when Player moves ) 
+[ Enemy | ... | moving Player ] -> [ > Enemy | ... | moving Player ] Sfx3
+[ UP Enemy ] -> [ EnemyUp ] 
+[ DOWN Enemy ] -> [ EnemyDown ] 
+[ LEFT Enemy ] -> [ EnemyLeft ] 
+[ RIGHT Enemy ] -> [ EnemyRight ]
+( 2. Turn Enemy clockwise if blocked by a Wall in front ) 
+left [ EnemyLeft | EnemyObstacle ] -> [ EnemyUp | EnemyObstacle ] 
+down [ EnemyDown | EnemyObstacle ] -> [ EnemyLeft | EnemyObstacle ] 
+right [ EnemyRight | EnemyObstacle ] -> [ EnemyDown | EnemyObstacle ] 
+up [ EnemyUp | EnemyObstacle ] -> [ EnemyRight | EnemyObstacle ] 
+( 3. Advance Enemy in its active direction when Player moves ) 
 [ moving Player ] [ EnemyUp ] -> [ moving Player ] [ UP EnemyUp ] 
 [ moving Player ] [ EnemyDown ] -> [ moving Player ] [ DOWN EnemyDown ] 
 [ moving Player ] [ EnemyLeft ] -> [ moving Player ] [ LEFT EnemyLeft ] 
 [ moving Player ] [ EnemyRight ] -> [ moving Player ] [ RIGHT EnemyRight ]
 
+
 [BloodEnemy] -> [Background]
 [ > PlayerWithSword | Enemy ] -> [ sprt_south | BloodEnemy ] Sfx2
 [ >  Enemy | PlayerEmpty ] -> [Enemy | BloodPlayer ] Sfx1 
+
+(BOSS RULES)
+
+( Automatically attach markers to all active Boss tiles ) 
+[ boss no isBossAlive ] -> [ boss isBossAlive ] 
+
+(player with sword kills boss)
+[ > PlayerWithSword | BossBL ] [ BossBR ] -> [ sprt_south | BloodEnemy ] [ BloodEnemy ] Sfx2
+[ > PlayerWithSword | BossBR ] [ BossBL ] -> [ sprt_south | BloodEnemy ] [ BloodEnemy ] Sfx2
+
+late [ isBossAlive no boss ] -> [ ] 
+
+(boss kills player)
+late [ Boss | PlayerEmpty ] [ isBossAlive ] -> [ Boss | BloodPlayer ] [ isBossAlive ] Sfx1
+
+( 4. Line of Sight: Turn Boss movement vector towards Player ) 
+[ BossBL | ... | moving Player ] [ BossBR ] -> [ > BossBL | ... | moving Player ] [ > BossBR ] 
+[ BossBR | ... | moving Player ] [ BossBL ] -> [ > BossBR | ... | moving Player ] [ > BossBL ]
+
+(--- 3\. Directional Obstacle Rotation ---) ( Moving UP into obstacle above BL or BR -&gt; Turn RIGHT ) 
+up [ UP BossBL | BossObstacle ] [ UP BossBR ] -> [ RIGHT BossBL | BossObstacle ] [ RIGHT BossBR ] 
+up [ UP BossBR | BossObstacle ] [ UP BossBL ] -> [ RIGHT BossBR | BossObstacle ] [ RIGHT BossBL ] 
+( Moving RIGHT into obstacle to the right of BR -&gt; Turn DOWN ) 
+right [ RIGHT BossBR | BossObstacle ] [ RIGHT BossBL ] -> [ DOWN BossBR | BossObstacle ] [ DOWN BossBL ] 
+( Moving DOWN into obstacle below BL or BR -&gt; Turn LEFT ) 
+down [ DOWN BossBL | BossObstacle ] [ DOWN BossBR ] -> [ LEFT BossBL | BossObstacle ] [ LEFT BossBR ] 
+down [ DOWN BossBR | BossObstacle ] [ DOWN BossBL ] -> [ LEFT BossBR | BossObstacle ] [ LEFT BossBL ] 
+( Moving LEFT into obstacle to the left of BL -&gt; Turn UP ) 
+left [ LEFT BossBL | BossObstacle ] [ LEFT BossBR ] -> [ UP BossBL | BossObstacle ] [ UP BossBR ] 
+
+[ moving Boss | Boss ] -> [ moving Boss | moving Boss ]
+
+
+
+
+
+
 
 [ Right PlayerEmpty ] -> [ Right sprt_east ]
 [ Left PlayerEmpty ] -> [ Left sprt_west ]
@@ -939,33 +1021,64 @@ no Enemy
 LEVELS
 =======
 
+( Level 3 )
+
+,,,,,,¨¨¨¨¨¨¨,,.,,.,.,
+.,,,.,¨¨'¨¨¨¨¨¨¨,,,,,.
+,,.,,¨…ƒ‡ƒƒƒƒƒƒƒ¨¨,,,,
+,,,,¨ƒƒ¨/¨ƒ¨ƒ¨/¨ƒƒ¨,.,
+.,.¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨,,,
+,,¨…ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨.
+,¨ƒƒƒƒƒƒƒƒƒƒŠ‹ƒƒƒƒƒ…¨,
+¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨
+¨ƒ¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨ƒ¨
+¨ƒ/ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ/ƒ¨
+¨ƒ¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨ƒ¨
+¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨
+,¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨
+.,¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨
+,,,¨ƒƒƒƒƒƒ…ƒƒƒƒƒƒƒ¨¨¨,
+,.,,¨ƒ¨ƒ¨ƒ¨†¨/¨ƒ¨ƒ¨¨,,
+,,,.¨ƒƒƒƒƒƒƒƒƒƒƒƒƒ¨,.,
+,.,,,¨¨¨¨¨ƒƒƒ¨¨¨¨¨,,,,
+,,.,,,,,.¨¨ƒ¨¨.,,..,,,
+,,,,.,,..¨¨ƒ¨¨,.,,.,,,
+.,,,,,,,,¨¨ƒ¨¨,,,,,,,,
+,.,,,,,,.¨¨ƒ¨¨.,,,,,.,
+,,,,.,,,,¨¨ƒ¨¨,,,.,,,,
+.,,,,.,.9¨¨ƒ¨¨9.,,,,,,
+,,,,,,,,9¨¨ƒ¨¨9,.,,,,,
+,,.,,,.,,99+99,,.,,,,,
+
 
 ( Level 2 )
-.,.,,,,,¨,,,,,¨'¨,.......
-.....,¨¨ƒ¨¨¨¨¨ƒ‡ƒ¨¨.,,,.,
-.....¨ƒƒƒƒƒƒƒƒƒ‡ƒƒƒ¨¨¨¨,,
-.,¨¨¨ƒƒƒƒƒƒƒƒƒ¨‡¨ƒƒƒ¨ƒƒ¨.
-,¨ƒƒƒƒƒƒ¨„¨ƒƒƒƒƒƒƒƒƒƒ†ƒ¨,
+
+.,..,.,,,.,,.¨¨¨¨¨..,..,,
+.,.,,,,,¨,,,,¨¨'¨¨,...,..
+,...,,¨¨ƒ¨¨¨¨¨ƒ‡ƒ¨¨¨,,,.,
+..,..¨ƒƒƒƒƒƒƒƒƒ‡ƒƒƒƒ¨¨¨,,
+.,¨¨¨ƒƒƒƒƒƒƒƒƒ¨‡¨ƒƒƒƒƒƒ¨.
+,¨ƒƒƒ/ƒƒ¨„¨ƒƒ¨ƒƒƒ¨ƒ/ƒ†ƒ¨,
 .¨ƒ†ƒƒ¨¨,@?¨¨ƒƒƒƒƒ¨ƒƒƒƒ¨.
-.¨ƒƒƒƒƒ¨,@.,¨ƒƒƒƒƒ¨¨ƒƒ¨¨,
-,¨ƒ¨ƒ¨ƒ¨.@..,¨¨„¨¨¨ƒƒƒƒ¨.
+.¨ƒƒƒƒ…¨,@.,¨ƒƒƒƒƒ¨¨ƒƒ¨,,
+,¨ƒƒƒ¨ƒ¨.@..,¨¨„¨¨¨ƒƒƒ…¨.
 ,.¨ƒƒƒƒ„@@,....@.?¨ƒƒƒƒ¨.
 .,¨ƒƒ¨ƒ¨,@@@@@@@@@„ƒ‡ƒƒ¨,
 .,¨ƒƒƒƒ¨..,,,,.,,,¨ƒƒƒƒ¨.
 ,,¨ƒƒƒƒ¨,..¨¨.,,.,,¨ƒƒ¨,.
 .,,¨ƒƒ¨,¨¨¨ƒƒ¨¨¨¨¨¨,¨ƒƒ¨,
-¨¨¨¨‡¨¨¨ƒƒƒƒƒƒƒƒƒƒƒ¨ƒƒƒ¨.
+,¨¨¨‡¨¨¨ƒƒƒƒƒƒƒƒƒƒƒ¨ƒƒƒ¨.
 ¨ƒƒƒƒƒ¨ƒ†ƒƒƒƒƒ†ƒƒƒƒ¨ƒƒƒ¨,
 ¨ƒƒƒƒƒ‡ƒƒƒƒƒƒƒƒƒƒƒƒ‡ƒƒƒ¨,
 ¨ƒƒƒƒƒ¨¨¨¨¨„¨¨¨¨¨¨¨¨ƒƒƒ¨,
-¨¨¨ƒ¨¨,.wel@µillage,¨ƒ¨¨,
-¨¨¨ƒ¨¨¨,.,,@.,..,.¨¨¨ƒ¨¨¨
-¨¨¨ƒ¨¨¨¨,,,@,,,,,.¨¨¨ƒ¨¨¨
-¨ƒ†ƒƒ/ƒ¨,,,@,,.,,.¨ƒ/ƒ†ƒ¨
-¨ƒƒƒƒƒƒ¨,,,@,,,,,.¨ƒƒƒƒƒ¨
-¨¨¨¨¨¨¨¨,,,+,,,,,.¨¨¨¨¨¨¨
-........,,,,,,.,,........
-........,,,,,,,,,........
+,¨¨ƒ¨¨,,wel@µillage,¨ƒ¨,,
+,,¨ƒ¨,,,.,,@.,..,.,,¨ƒ¨,,
+,¨¨ƒ¨¨¨,,,.@,,,,,,,¨¨ƒ¨¨,
+¨ƒ†ƒƒ/ƒ¨.,,@.,.,,.¨ƒ/ƒ†ƒ¨
+¨ƒƒƒƒƒƒ¨,,.@,,.,,.¨ƒƒƒƒƒ¨
+,¨¨¨¨¨¨.,,,+.,,,.,,¨¨¨¨¨,
+..,...,.,.,,,,.,,...,...,
+,...,...,,,.,,,,,.,...,..
 
 
 message Level 1: Go to Wel Village
@@ -1048,31 +1161,32 @@ message Level 1: Go to Wel Village
 message Welcome to Wel Village! Use the sword to stop the troll
 
 ( Level 1 )
-,.,,,.,¨¨'¨¨,,¨¨¨,,,,,.,.
-,,,.,,¨¡ƒ‡ƒ¡¨¨¡ƒ¡¨¨,,,,,.
-.,,,,¨¡ƒ¡ƒ¡†¡‡ƒ¡†¡ƒ¨,.,,.
-,.,.¨¡ƒ¡ƒ¡ƒ¡¨¨¡ƒ¡‡¡¨,,,,.
-.,,¨¡ƒ¡¨¨¨¨¨,,¨„¨¡ƒ¨,,.,,
-.,¨¡ƒ¡¨,,,.,,?.@,¨‡¡¨¨,,.
-,¨¡ƒ¡ƒ¨,&{,,.,.@,¨ƒ¡ƒ¡¨,.
-.¨ƒ¡ƒ¡¨,_}..,..@.¨¡¨¡ƒ¨.,
-.¨¡2¡ƒ¨.,,....,@@„ƒ¡†¡¨.,
-,¨ƒ¡ƒ¡„@@@@@@@@@,¨¡¨¡ƒ¨,.
-.¨¡/¡ƒ¨,,,.,,,,@.¨ƒ¡†¡¨,.
-.,¨¡ƒ¨,,.,,¨¨¨.@,¨¡ƒ¨¨.,,
-,.,¨¨,¨¨¨¨¨ƒ¡ƒ¨„¨,¨¨,,,,.
-.,,,.¨ƒ¡ƒ¡ƒ¡1¡ƒ¡ƒ¨,,.,,,.
-,,.,,¨¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¨.,,,,.
-,,,,.¨ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡¨,,.,,,
-,,.,,,¨¨¨¨¨¨„¨¨¨¨¨,,,,,,.
-,,,.,,,,,wel.µillage,,,,.
-,,,,,.,,..,..,.,.,,.,,,,,
-,.,,,,,,,,,,.,,,,,,,,,,,.
-,,.,,,,,,.,,.,,,,,,,,.,,,
-,,,,,.,,,,,,.,.,,,.,,,,,,
-,.,,,,.,,,,,+,,,,,,,,,,,,
-,,,,,,,,,.,,,,,,,.,,,,,.,
-,,,.,,,,,,,,,,,,,,,,,,,,,
+,.,.,l¨¨¨¨¨,.,,.,,.,.,
+.,,,.,¨¨'¨¨,,¨¨¨,,,,,.
+,,.,,¨¡ƒ‡ƒ¡¨¨¡ƒ¡¨¨,,,,
+,,,,¨¡ƒ¡ƒ¡†¡‡ƒ¡†¡ƒ¨,.,
+.,.¨¡ƒ¡ƒ¡ƒ¡¨¨¡ƒ¡‡¡¨,,,
+,,¨¡ƒ¡¨¨¨¨¨,,¨„¨¡ƒ¨,,.
+,¨¡ƒ¡¨,,,.,,?.@,¨‡¡¨¨,
+¨¡ƒ¡ƒ¨,&{,,.,.@,¨ƒ¡ƒ¡¨
+¨ƒ¡ƒ¡¨,_}..,..@.¨¡¨¡ƒ¨
+¨¡2¡ƒ¨.,,....,@@„ƒ¡†¡¨
+¨ƒ¡ƒ¡„@@@@@@@@@,¨¡¨¡ƒ¨
+¨¡/¡ƒ¨,,,.,,,,@.¨ƒ¡†¡¨
+,¨¡ƒ¨,,.,,¨¨¨.@,¨¡ƒ¨¨.
+.,¨¨,¨¨¨¨¨ƒ¡ƒ¨„¨,¨¨,,,
+,,,.¨ƒ¡ƒ¡ƒ¡1¡ƒ¡ƒ¨,,.,,
+,.,,¨¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¨.,,,
+,,,.¨ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡¨,,.,
+,.,,,¨¨¨¨¨¨„¨¨¨¨¨,,,,,
+,,.,,,,,wel.µillage,,,
+,,,,.,,..9..,9,.,,.,,,
+.,,,,,,,,,,.,,,,,,,,,,
+,.,,,,,,9,,.,,9,,,,,.,
+,,,,.,,,,,,.,.,,,.,,,,
+.,,,,.,9,,,+,,,9,,,,,,
+,,,,,,,,.,,,,,,,.,,,,,
+,,.,,,9,,,,,,,,,9,,,,,
 
 message Level 2: Go to Wob Town
 
