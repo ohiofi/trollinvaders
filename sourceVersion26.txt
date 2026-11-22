@@ -932,6 +932,8 @@ late [ Boss | PlayerEmpty ] [ isBossAlive ] -> [ Boss | BloodPlayer ] [ isBossAl
 [ BossBL | ... | moving Player ] [ BossBR ] -> [ > BossBL | ... | moving Player ] [ > BossBR ] 
 [ BossBR | ... | moving Player ] [ BossBL ] -> [ > BossBR | ... | moving Player ] [ > BossBL ]
 
+
+
 (--- 3\. Directional Obstacle Rotation ---) ( Moving UP into obstacle above BL or BR -&gt; Turn RIGHT ) 
 up [ UP BossBL | BossObstacle ] [ UP BossBR ] -> [ RIGHT BossBL | BossObstacle ] [ RIGHT BossBR ] 
 up [ UP BossBR | BossObstacle ] [ UP BossBL ] -> [ RIGHT BossBR | BossObstacle ] [ RIGHT BossBL ] 
