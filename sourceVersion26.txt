@@ -835,12 +835,13 @@ notBoat = PlayerEmpty or PlayerWithSword
 wall = brick or wood or stone or redbrick
 floor = floorTile or tanFloor or grayFloor or floorTile2
 Enemy = EnemyUp or EnemyDown or EnemyLeft or EnemyRight
-EnemyObstacle = wall or key or lock or sword or water or pond or BossBL or BossBR
-BossObstacle = wall or key or lock or sword or water or pond or enemy or player
+
 Š = floorTile2 and BossBL
 ‹ = floorTile2 and BossBR
 Boss = BossBL or BossBR
 Fire = Fire_frame0 or Fire_frame1 or Fire_frame2 or Fire_frame3
+EnemyObstacle = wall or key or lock or sword or water or pond or BossBL or BossBR or tree or fire
+BossObstacle = wall or key or lock or sword or water or pond or enemy or player or tree or fire
 ‰ = floortile2 and Fire_frame0
 
 ! = dock
@@ -1103,21 +1104,21 @@ message Level 5
 .,,.,,.,,.,#####,,.,,.,,
 ,,,,,,,###,#####,,,,,,,,
 ,,..,,#¡¡2###'######,,,,
-,,,..,#‰¡¡###‡¡¡¡¡¡…#,..
+,,,..,#¡¡¡###‡¡¡¡¡¡…#,..
 ,,,,,,#¡¡¡#¡¡¡¡¡¡¡¡¡#..,
 ,,..,#/‡¡¡‡¡¡¡¡¡¡‰¡¡#,,,
-,..,,,#¡¡¡#¡¡¡¡¡¡¡¡¡##,,
-,,###,,#„#,#¡/¡##„##¡¡#,
-,#¡¡¡##,@,,,###,,@,#†¡#,
+,..,,,#¡¡¡##¡/¡¡¡¡¡¡##,,
+,,###,,#„#,,#####„##¡/#,
+,#¡¡¡##,@,,..9,,,@?#†¡#,
 ,#¡#†¡„@@@@@@@@@@@@„¡¡#.
-,#¡¡¡¡#,..,..,,?,@,####,
-,,#¡#¡#..,,,..,..@,#¡/¡#
-,,#¡¡¡#,,,?..,..,@@„¡¡¡#
-,#¡¡##..,..,,..,,@,#¡¡2#
-#3¡¡¡¡#,&{..,,###„#,###,
-#¡¡¡¡¡¡#_},9,#¡¡¡¡¡#,,,,
-#¡¡¡¡¡¡¡#,,,,#¡†‰‰¡#,,,,
-#‰¡¡¡¡¡¡#.9,9#¡¡¡¡¡#,,,,
+,#¡¡¡¡#,..,..,,,,@,####,
+,,#¡#¡#..,,,..,..@,#/¡¡#
+,,#¡¡¡#,,,,,.,..,@@„¡¡¡#
+,#¡¡##9,?..,,9?,,@,#¡¡2#
+#3¡¡¡¡#,&{9,9,###„#,###,
+#¡¡¡¡¡¡#_},,,#¡¡¡¡¡#,,,,
+#¡¡¡¡¡¡¡#,,9,#¡†‰‰¡#,,,,
+#‰¡¡¡¡¡¡#.,,,#¡¡¡¡¡#,,,,
 ,##„##„#,,,,,,#„###,,,,,
 ,,,.9,.9,.,,.,9.9,,,,.,,
 wob.t9wn,,,,,,,,,,,,,,,,
@@ -1125,7 +1126,6 @@ wob.t9wn,,,,,,,,,,,,,,,,
 ,,,.,,,9,9,9,9,9,,..,,,,
 ,,,.,,,,,..,..,,,,,,,,,,
 ,,,+,,,,..,,.,,,,,,,,,,,
-
 
 ( Level 2 )
 message Level 2
