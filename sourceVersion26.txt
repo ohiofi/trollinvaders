@@ -6,7 +6,7 @@ color_palette 7
 key_repeat_interval 0.2
 zoomscreen 16x10
 
-realtime_interval .5
+realtime_interval .25
 again_interval 1
 run_rules_on_level_start
 
@@ -66,7 +66,7 @@ red darkred
 00010
 11111
 01000
-11111
+
 
 
 stone
@@ -76,7 +76,7 @@ gray darkgray
 00010
 11111
 01000
-11111
+
 
 wood
 #6B2503 #4B0503
@@ -85,6 +85,7 @@ wood
 00010
 11111
 01000
+
 
 redbrick
 #A52A2A #5C4033
@@ -197,7 +198,6 @@ sprt_south
 .232.
 13331
 31113
-.111.
 .3.3.
 
 swdsprt_south
@@ -206,7 +206,6 @@ swdsprt_south
 .2324
 13334
 31113
-.111.
 .3.3.
 
 sprt_east
@@ -215,7 +214,6 @@ sprt_east
 .023.
 .122.
 .1112
-.111.
 .2.2.
 
 swdsprt_east
@@ -224,7 +222,6 @@ swdsprt_east
 .0234
 .1224
 .1112
-.111.
 .2.2.
 
 sprt_west
@@ -233,7 +230,6 @@ sprt_west
 .231.
 .330.
 3000.
-.000.
 .3.3.
 
 swdsprt_west
@@ -242,7 +238,6 @@ swdsprt_west
 4231.
 4330.
 3000.
-.000.
 .3.3.
 
 sprt_north
@@ -251,7 +246,6 @@ sprt_north
 .333.
 11111
 31113
-.111.
 .3.3.
 
 swdsprt_north
@@ -260,7 +254,6 @@ swdsprt_north
 .3334
 11114
 31113
-.111.
 .3.3.
 
 playerBoat
@@ -466,7 +459,6 @@ Villager0
 .303.
 20002
 02220
-02220
 .0.0. 
 
 Villager1
@@ -474,7 +466,6 @@ Villager1
 .111.
 .303.
 20002
-02220
 02220
 .0.0. 
 
@@ -484,7 +475,6 @@ Villager2
 .303.
 20002
 02220
-02220
 .0.0. 
 
 Villager3
@@ -492,7 +482,6 @@ Villager3
 .111.
 .303.
 20002
-02220
 02220
 .0.0. 
 
@@ -502,7 +491,6 @@ Villager4
 .303.
 20002
 02220
-02220
 .0.0. 
 
 VillagerE
@@ -510,7 +498,6 @@ VillagerE
 .111.
 .303.
 20002
-02220
 02220
 .0.0. 
 
@@ -520,7 +507,6 @@ VillagerN
 .303.
 20002
 02220
-02220
 .0.0. 
 
 VillagerS
@@ -529,7 +515,6 @@ VillagerS
 .303.
 20002
 02220
-02220
 .0.0. 
 
 VillagerW
@@ -537,7 +522,6 @@ VillagerW
 .111.
 .303.
 20002
-02220
 02220
 .0.0. 
 
@@ -766,16 +750,20 @@ lightgray
 
 tree
 #356E3B brown  #224B22 #3F6962
-..0..
 .203.
 20003
 20003
 .203.
 ..1..
-..1..
+
 
 dark
 black
+00000
+00000
+00000
+00000
+00000
 
 lock
 orange black
@@ -792,6 +780,42 @@ orange
 0.000
 .0..0
 .....
+
+( marker to prevent multiple frames per clock tick )
+Fire_hasAnimated
+transparent
+
+Fire_frame0
+#000000 #ff0026 #ff8800 #ffdd00
+...1.
+1.1..
+.32.1
+.232.
+.000.
+
+Fire_frame1
+#000000 #ff0026 #ff8800 #ffdd00
+1..1.
+..2.1
+.2232
+.232.
+.000.
+
+Fire_frame2
+#000000 #ff0026 #ff8800 #ffdd00
+.1...
+..1.1
+1.23.
+.232.
+.000.
+
+Fire_frame3
+#000000 #ff0026 #ff8800 #ffdd00
+.1..2
+2.1..
+2322.
+.232.
+.000.
 
 
 =======
@@ -813,12 +837,11 @@ floor = floorTile or tanFloor or grayFloor or floorTile2
 Enemy = EnemyUp or EnemyDown or EnemyLeft or EnemyRight
 EnemyObstacle = wall or key or lock or sword or water or pond or BossBL or BossBR
 BossObstacle = wall or key or lock or sword or water or pond or enemy or player
-
 Š = floorTile2 and BossBL
 ‹ = floorTile2 and BossBR
-
 Boss = BossBL or BossBR
-
+Fire = Fire_frame0 or Fire_frame1 or Fire_frame2 or Fire_frame3
+‰ = floortile2 and Fire_frame0
 
 ! = dock
 " = sandC
@@ -912,9 +935,10 @@ Background
 
 water, dock, sand, sandL, sandR, sandC, sandSW, sandSE, grass, grassL,  grassR, floor, letter,  exit, mountainNE, mountainNW, mountainSW, mountainSE, doorway
 
-Player, wall, propBoat, Sword, Enemy, Villager, BloodEnemy, pond, tree, lock, key, boss
+Player, wall, propBoat, Sword, Enemy, Villager, BloodEnemy, pond, tree, lock, key, boss, fire
 
 isBossAlive
+Fire_hasAnimated
 
 dark
 
@@ -951,6 +975,7 @@ up [ EnemyUp | EnemyObstacle ] -> [ EnemyRight | EnemyObstacle ]
 [BloodEnemy] -> [Background]
 [ > PlayerWithSword | Enemy ] -> [ sprt_south | BloodEnemy ] Sfx2
 [ >  Enemy | PlayerEmpty ] -> [Enemy | BloodPlayer ] Sfx1 
+[ > Enemy | Enemy ] -> [ < Enemy | > Enemy ]
 
 (BOSS RULES)
 
@@ -970,15 +995,11 @@ late [ isBossAlive no boss ] -> [ ]
 (boss kills player)
 late [ Boss | PlayerEmpty ] [ isBossAlive ] -> [ Boss | BloodPlayer ] [ isBossAlive ] Sfx1
 
-( 4. Line of Sight: Turn Boss movement vector towards Player ) 
-( [ BossBL | ... | moving Player ] [ BossBR ] -> [ > BossBL | ... | moving Player ] [ > BossBR ]  )
-( [ BossBR | ... | moving Player ] [ BossBL ] -> [ > BossBR | ... | moving Player ] [ > BossBL ] )
+( Line of Sight: Turn Boss movement vector towards Player ) 
 [ BossBL | ... | moving Player ]  -> [ > BossBL | ... | moving Player ] 
 [ BossBR | ... | moving Player ]  -> [ > BossBR | ... | moving Player ] 
 
-
-
-(--- 3\. Directional Obstacle Rotation ---) ( Moving UP into obstacle above BL or BR -&gt; Turn RIGHT ) 
+( Directional Obstacle Rotation ---) ( Moving UP into obstacle above BL or BR -&gt; Turn RIGHT ) 
 up [ UP BossBL | BossObstacle ] [ UP BossBR ] -> [ RIGHT BossBL | BossObstacle ] [ RIGHT BossBR ] 
 up [ UP BossBR | BossObstacle ] [ UP BossBL ] -> [ RIGHT BossBR | BossObstacle ] [ RIGHT BossBL ] 
 ( Moving RIGHT into obstacle to the right of BR -&gt; Turn DOWN ) 
@@ -1015,15 +1036,22 @@ left [ LEFT BossBL | BossObstacle ] [ LEFT BossBR ] -> [ UP BossBL | BossObstacl
 [> notBoat dock | propBoat ] -> [ dock | playerBoat water1 ]
 [> PlayerEmpty| water] -> cancel
 [> PlayerWithSword| water] -> cancel
-[water5] -> [water1]
-[water4] -> [water5]
-[water3] -> [water4]
-[water2] -> [water3]
-[water1] -> [water2]
-[blackExit4] -> [blackExit1]
-[blackExit3] -> [blackExit4]
-[blackExit2] -> [blackExit3]
-[blackExit1] -> [blackExit2]
+
+(animations)
+[ stationary Player ] [water5] -> [ Player ] [water1]
+[ stationary Player ] [water4] -> [ Player ] [water5]
+[ stationary Player ] [water3] -> [ Player ] [water4]
+[ stationary Player ] [water2] -> [ Player ] [water3]
+[ stationary Player ] [water1] -> [ Player ] [water2]
+[ stationary Player ] [blackExit4] -> [ Player ] [blackExit1]
+[ stationary Player ] [blackExit3] -> [ Player ] [blackExit4]
+[ stationary Player ] [blackExit2] -> [ Player ] [blackExit3]
+[ stationary Player ] [blackExit1] -> [ Player ] [blackExit2]
+late [ Fire_hasAnimated ] -> []
+random [ stationary Player ] [ Fire_frame0 no Fire_hasAnimated ] -> [ Player ] [ Fire_frame1 Fire_hasAnimated ]
+random [ stationary Player ] [ Fire_frame1 no Fire_hasAnimated ] -> [ Player ] [ Fire_frame2 Fire_hasAnimated ]
+random [ stationary Player ] [ Fire_frame2 no Fire_hasAnimated ] -> [ Player ] [ Fire_frame3 Fire_hasAnimated ]
+random [ stationary Player ] [ Fire_frame3 no Fire_hasAnimated ] -> [ Player ] [ Fire_frame0 Fire_hasAnimated ]
 
 late [| Player | Villager0] -> [Player| |Villager2]message Villager: "Thank you for helping" 
 
@@ -1052,6 +1080,7 @@ late [ Player no Floor ] [ Floor no Dark ] -> [ Player no Floor ] [ Floor Dark ]
 late [ Player no Floor ] [ Dark no Floor ] -> [ Player no Floor ] [ no Floor ]
 (--- Exemption Rule: Always strip Dark from Doorway ---) 
 late [ Doorway Dark ] -> [ Doorway ]
+late [ Wall Dark ] -> [ Wall ]
 late [ Exit Dark ] -> [ Exit ]
 
 ==============
@@ -1068,45 +1097,47 @@ LEVELS
 =======
 
 
-( Level 3 )
-( Level 3 )
-,,,,,,¨¨¨¨¨,,,,.,,.,.,
-.,,,.,¨¨'¨¨¨¨¨¨¨,,,,,.
-,,.,,¨…ƒ‡ƒƒƒƒƒƒƒ¨,,,,,
-,,,,¨ƒƒ¨/¨/¨ƒ¨/¨ƒ¨,,.,
-.,.¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨,,,
-,,¨…ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨,.
-,¨ƒƒƒƒƒƒƒƒƒƒŠ‹ƒƒƒƒƒ…¨,
-¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨
-¨ƒ¨ƒƒƒƒƒƒŠ‹ƒƒƒƒƒƒƒƒ¨ƒ¨
-¨ƒ/ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ/ƒ¨
-¨ƒ¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨ƒ¨
-¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨
-¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨
-¨¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨
-¨¨¨¨ƒƒƒƒƒƒ…ƒƒƒƒƒƒƒ¨¨¨¨
-¨¨¨¨¨ƒ¨ƒ¨ƒ¨†¨/¨ƒ¨ƒ¨¨¨¨
-¨¨¨¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨ƒƒƒ¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨
-¨¨¨¨¨¨¨¨¨¨¨+¨¨¨¨¨¨¨¨¨¨
+
+message Level 5
+( Level 5 )
+.,,.,,.,,.,#####,,.,,.,,
+,,,,,,,###,#####,,,,,,,,
+,,..,,#¡¡2###'######,,,,
+,,,..,#‰¡¡###‡¡¡¡¡¡…#,..
+,,,,,,#¡¡¡#¡¡¡¡¡¡¡¡¡#..,
+,,..,#/‡¡¡‡¡¡¡¡¡¡‰¡¡#,,,
+,..,,,#¡¡¡#¡¡¡¡¡¡¡¡¡##,,
+,,###,,#„#,#¡/¡##„##¡¡#,
+,#¡¡¡##,@,,,###,,@,#†¡#,
+,#¡#†¡„@@@@@@@@@@@@„¡¡#.
+,#¡¡¡¡#,..,..,,?,@,####,
+,,#¡#¡#..,,,..,..@,#¡/¡#
+,,#¡¡¡#,,,?..,..,@@„¡¡¡#
+,#¡¡##..,..,,..,,@,#¡¡2#
+#3¡¡¡¡#,&{..,,###„#,###,
+#¡¡¡¡¡¡#_},9,#¡¡¡¡¡#,,,,
+#¡¡¡¡¡¡¡#,,,,#¡†‰‰¡#,,,,
+#‰¡¡¡¡¡¡#.9,9#¡¡¡¡¡#,,,,
+,##„##„#,,,,,,#„###,,,,,
+,,,.9,.9,.,,.,9.9,,,,.,,
+wob.t9wn,,,,,,,,,,,,,,,,
+,,..,,,,9.9,9,9,9,,..,,,
+,,,.,,,9,9,9,9,9,,..,,,,
+,,,.,,,,,..,..,,,,,,,,,,
+,,,+,,,,..,,.,,,,,,,,,,,
 
 
 ( Level 2 )
+message Level 2
 
+( Level 2 )
 .,..,.,,,.,,.¨¨¨¨¨..,..,,
 .,.,,,,,¨,,,,¨¨'¨¨,...,..
 ,...,,¨¨ƒ¨¨¨¨¨ƒ‡ƒ¨¨¨,,,.,
 ..,..¨ƒƒƒƒƒƒƒƒƒ‡ƒƒƒƒ¨¨¨,,
 .,¨¨¨ƒƒƒƒƒƒƒƒƒ¨‡¨ƒƒƒƒƒƒ¨.
 ,¨ƒƒƒ/ƒƒ¨„¨ƒƒ¨ƒƒƒ¨ƒ/ƒ†ƒ¨,
-.¨ƒ†ƒƒ¨¨,@?¨¨ƒƒƒƒƒ¨ƒƒƒƒ¨.
+.¨ƒ†ƒƒ¨¨,@?¨¨ƒ‰ƒ‰ƒ¨ƒƒƒƒ¨.
 .¨ƒƒƒƒ…¨,@.,¨ƒƒƒƒƒ¨¨ƒƒ¨,,
 ,¨ƒƒƒ¨ƒ¨.@..,¨¨„¨¨¨ƒƒƒ…¨.
 ,.¨ƒƒƒƒ„@@,....@.?¨ƒƒƒƒ¨.
@@ -1115,8 +1146,8 @@ LEVELS
 ,,¨ƒƒƒƒ¨,..¨¨.,,.,,¨ƒƒ¨,.
 .,,¨ƒƒ¨,¨¨¨ƒƒ¨¨¨¨¨¨,¨ƒƒ¨,
 ,¨¨¨‡¨¨¨ƒƒƒƒƒƒƒƒƒƒƒ¨ƒƒƒ¨.
-¨ƒƒƒƒƒ¨ƒ†ƒƒƒƒƒ†ƒƒƒƒ¨ƒƒƒ¨,
-¨ƒƒƒƒƒ‡ƒƒƒƒƒƒƒƒƒƒƒƒ‡ƒƒƒ¨,
+¨ƒƒƒƒƒ¨ƒ†ƒ‰ƒ‰ƒ†ƒƒƒƒ¨ƒƒ‰¨,
+¨ƒ‰ƒƒƒ‡ƒƒƒƒƒƒƒƒƒƒƒƒ‡ƒƒƒ¨,
 ¨ƒƒƒƒƒ¨¨¨¨¨„¨¨¨¨¨¨¨¨ƒƒƒ¨,
 ,¨¨ƒ¨¨,,wel@µillage,¨ƒ¨,,
 ,,¨ƒ¨,,,.,,@.,..,.,,¨ƒ¨,,
@@ -1126,6 +1157,129 @@ LEVELS
 ,¨¨¨¨¨¨.,,,+.,,,.,,¨¨¨¨¨,
 ..,...,.,.,,,,.,,...,...,
 ,...,...,,,.,,,,,.,...,..
+
+
+( Level 1 )
+message Level 1
+( Level 2 )
+,.,.,.¨¨¨¨¨,.,,,,9999,
+.,,,9,¨¨'¨¨,,¨¨¨¨,,,,9
+,9.,,¨¡ƒ‡ƒ¡¨¨¡ƒ¡„.,,,9
+,,,,¨¡‰¡ƒ¡†¡‡‡¡†¨.,,,9
+.,.¨¡ƒ¡ƒ¡ƒ¡¨¨¡ƒ¡¨.,,,9
+9,¨¡ƒ¡¨¨„¨¨,,¨„¨..,,,9
+,¨¡ƒ¡¨,,,.,,?.@,¨„¨,,9
+¨¡‰¡ƒ¨,&{,,.,.@,¨ƒ¨¨¨,
+¨ƒ¡ƒ¡¨,_}..,..@.¨‡ƒ¡ƒ¨
+¨¡2¡ƒ¨.,,....,@@„ƒ¡†¡¨
+¨ƒ¡ƒ¡„@@@@@@@@@,¨¡‰¡ƒ¨
+¨¡ƒ¡ƒ¨@,,.,,,,@.¨ƒ¡†¡¨
+,¨/ƒ¨,@.,,¨¨¨.@,¨¡ƒ¨¨.
+.,¨¨,¨„¨9¨ƒ¡ƒ¨„¨,¨¨,,9
+9,,.¨ƒ¡ƒ¨ƒ¡1¡ƒ¡ƒ¨,,.,,
+,.,,¨¡‰¡¨¡ƒ¡ƒ¡ƒ‰ƒ¨.,9,
+,9,.¨ƒ¡ƒ¨ƒ¡ƒ¡ƒ¡ƒ¡¨9,.,
+,.,9,¨¨¨9¨¨„¨¨¨¨¨,,,,,
+,,.,,,,,wel.µillage,,,
+,,,,9,,..9..,9,.,,.,,,
+.,,,,,,,,,,.,,,,,,,,,,
+,.,,,,,,9,,.,,9,,,,,.,
+,,,,.,,,,,,.,.,,,.,,,,
+.,,,,.,9,,,+,,,9,,,,,,
+,,,,,,,,.,,,,,,,.,,,,,
+,,.,,,9,,,,,,,,,9,,,,,
+
+
+
+
+
+
+
+
+
+message Level 6
+,,,,,,...¨¨¨¨¨,.,,.,.,.
+.,,,.,¨¨¨¨¨'¨¨¨¨¨,,,,..
+,,.,,¨…‡/ƒ/‡/ƒ/‡ƒ¨,,,,.
+.,,,,¨ƒƒ‰¨¨¨¨¨‰ƒƒ¨,.,..
+..,.¨ƒƒƒƒƒƒƒƒƒƒƒƒƒ¨,,..
+..,,¨…ƒƒƒƒƒƒƒƒƒƒƒƒ¨¨...
+..,¨ƒƒƒƒƒƒƒƒƒƒƒƒƒ…ƒ¨¨..
+..,¨ƒƒƒƒƒƒƒƒƒƒŠ‹ƒƒƒ¨¨¨.
+..¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨.
+..¨/‰ƒƒŠ‹ƒƒƒƒƒƒƒƒƒ‰/¨¨.
+..¨ƒ†ƒƒƒƒƒƒƒƒƒƒƒƒƒ†ƒ¨¨.
+..¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨.
+..¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨.
+..¨¨¨ƒƒƒƒƒƒƒƒƒƒƒƒƒ¨¨¨¨.
+..¨¨¨ƒƒƒƒƒ…†ƒƒƒƒƒƒ¨¨¨¨.
+..¨¨¨¨ƒƒ‰¨¨¨¨¨‰ƒƒ¨¨¨¨¨.
+..¨¨¨¨ƒƒƒƒƒƒƒƒƒƒƒ¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨‰ƒƒƒ‰¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨‰ƒ‰¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨ƒ¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨,¨¨¨¨¨¨¨¨¨¨¨
+¨¨¨¨¨¨¨¨¨¨¨+¨¨¨¨¨¨¨¨¨¨¨
+
+
+( Winky City )
+message Level 7
+.......................©©©©©..
+,©,,9,,©,999999©©©©©©©©©©'©©©,
+©ƒ©,,,©ƒ©99,99©ƒƒ‰ƒƒƒ©ƒƒƒ‡ƒƒƒ©
+©ƒƒ©©©ƒƒ„.....„ƒƒƒƒƒ‡/‡ƒƒƒƒ‰ƒ©
+©ƒƒƒƒƒƒƒ©,,,,,©ƒƒƒƒƒƒ©ƒƒƒƒƒƒƒ©
+©ƒ†ƒƒƒƒ‰©99,99©©©„©©©©ƒƒƒ‡ƒƒƒ©
+©ƒƒƒƒƒƒƒ©999999,?@.,©©©©©/©©©©
+©©ƒ©©©„©9,?,,,,.,@,,,©©ƒƒ‡ƒƒ2©
+©/ƒƒ©,@,,,,,,,,,,@&{@@„ƒƒƒƒƒƒ©
+©ƒƒƒ©,@,,.,.,,.,.@_}@,©ƒƒƒƒƒƒ©
+©ƒ‰ƒ„@@@@@@@@@@@@@@@@?©ƒƒƒƒ‰ƒ©
+©ƒƒƒ©,@,,,,,,,,@,,,,@,©ƒƒƒƒƒƒ©
+©©ƒ©©.@.©©©©©©©„©©©.@.©©©‡©†©©
+©ƒƒƒ©©„©©ƒƒƒƒ4ƒƒƒƒ©©„©©©ƒƒƒƒƒ©
+©ƒ†ƒ©ƒƒƒ©ƒƒƒ‰ƒ‰ƒƒƒ©ƒƒƒƒ©ƒƒƒ/ƒ©
+©ƒƒƒ©ƒƒƒ©ƒƒƒƒƒƒƒƒƒ©ƒ‰ƒƒ©ƒƒƒ‰ƒ©
+©ƒƒƒ©ƒƒ‰©ƒƒƒƒƒƒƒƒƒ©ƒ†ƒƒ©ƒƒƒƒƒ©
+,©„©©ƒƒƒ©©©©©„©©©©©ƒƒƒƒ©©©„©©,
+9,,,,©„©,inky,cit,9©„©©,,,,,,9
+9.,,,,,,9,,,,,,,,99,,,,,,,,,9,
+9,9,,,,,99,,,,,,,99,,,,,,,9,,9
+,9,9,9,9,9,,,,,,,9,,9,,,,,9,9,
+,,9,9,999,,,,+,,,,99,9,9,9,9,,
+......................9.9.....
+..............................
+
+( Winky City )
+.......................©©©©©..
+,©,,9,,©,999999©©©©©©©©©©'©©©,
+©ƒ©,,,©ƒ©99,99©ƒƒ‰ƒƒƒ©ƒƒƒ‡ƒƒƒ©
+©ƒƒ©©©ƒƒ„.....„ƒƒƒƒƒ‡/‡ƒƒƒƒ‰ƒ©
+©ƒƒƒƒƒ†ƒ©,,,,,©ƒƒƒƒƒƒ©ƒƒƒƒƒƒƒ©
+©ƒ†ƒƒƒƒ‰©99,99©©©„©©©©ƒƒƒ‡ƒƒƒ©
+©ƒƒƒ‰ƒƒƒ©999999,?@.,©©©©©/©©©©
+©©ƒ©©©„©9,?,,,,.,@,,,©©ƒƒ‡ƒƒ2©
+©/ƒƒ©,@,,,,,,,,,,@&{@@„ƒƒƒƒƒƒ©
+©ƒƒƒ©,@,,.,.,,.,.@_}@,©ƒƒƒƒƒƒ©
+©ƒ‰ƒ„@@@@@@@@@@@@@@@@?©ƒƒƒƒ‰ƒ©
+©ƒƒƒ©,@,,,,@,,,@,,,,@,©ƒƒƒƒƒƒ©
+©©ƒ©©.@.©©©„©©©„©©©.@.©©©‡©†©©
+©ƒ†ƒ©©„©©ƒƒƒƒ4ƒƒƒƒ©©„©©©ƒƒƒƒƒ©
+©ƒƒƒ©ƒƒƒ©ƒƒƒ‰ƒ‰ƒƒƒ©ƒƒƒƒ©ƒƒƒ/ƒ©
+©ƒ†ƒ©ƒ‰ƒ©ƒƒƒƒƒƒƒƒƒ©ƒ‰ƒƒ©ƒƒƒ‰ƒ©
+©ƒƒƒ©ƒƒƒƒƒƒƒƒƒƒƒƒƒ©ƒ†ƒƒ©ƒƒƒƒƒ©
+,©„©©ƒƒƒ©©©©©„©©©©©ƒƒƒƒ©©©„©©,
+9,,,,©„©winky,city9©„©©,,,,,,9
+9.,,,,,,9,,,,,,,,99,,,,,,,,,9,
+9,9,,,,,99,,,,,,,99,,,,,,,9,,9
+,9,9,9,9,9,,,,,,,9,,9,,,,,9,9,
+,,9,9,999,,,,+,,,,,9,9,9,9,9,,
+,,,..,,,,,..,,,,..,,,.9,9,.,,,
+,,..,,,,,..,,,,..,...,..,.,.,.
 
 
 message Level 1: Go to Wel Village
@@ -1207,33 +1361,7 @@ message Level 1: Go to Wel Village
 
 message Welcome to Wel Village! Use the sword to stop the troll
 
-( Level 1 )
-,.,.,l¨¨¨¨¨,.,,.,,.,.,
-.,,,.,¨¨'¨¨,,¨¨¨,,,,,.
-,,.,,¨¡ƒ‡ƒ¡¨¨¡ƒ¡¨¨,,,,
-,,,,¨¡ƒ¡ƒ¡†¡‡ƒ¡†¡ƒ¨,.,
-.,.¨¡ƒ¡ƒ¡ƒ¡¨¨¡ƒ¡‡¡¨,,,
-,,¨¡ƒ¡¨¨¨¨¨,,¨„¨¡ƒ¨,,.
-,¨¡ƒ¡¨,,,.,,?.@,¨‡¡¨¨,
-¨¡ƒ¡ƒ¨,&{,,.,.@,¨ƒ¡ƒ¡¨
-¨ƒ¡ƒ¡¨,_}..,..@.¨¡¨¡ƒ¨
-¨¡2¡ƒ¨.,,....,@@„ƒ¡†¡¨
-¨ƒ¡ƒ¡„@@@@@@@@@,¨¡¨¡ƒ¨
-¨¡/¡ƒ¨,,,.,,,,@.¨ƒ¡†¡¨
-,¨¡ƒ¨,,.,,¨¨¨.@,¨¡ƒ¨¨.
-.,¨¨,¨¨¨¨¨ƒ¡ƒ¨„¨,¨¨,,,
-,,,.¨ƒ¡ƒ¡ƒ¡1¡ƒ¡ƒ¨,,.,,
-,.,,¨¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¨.,,,
-,,,.¨ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡ƒ¡¨,,.,
-,.,,,¨¨¨¨¨¨„¨¨¨¨¨,,,,,
-,,.,,,,,wel.µillage,,,
-,,,,.,,..9..,9,.,,.,,,
-.,,,,,,,,,,.,,,,,,,,,,
-,.,,,,,,9,,.,,9,,,,,.,
-,,,,.,,,,,,.,.,,,.,,,,
-.,,,,.,9,,,+,,,9,,,,,,
-,,,,,,,,.,,,,,,,.,,,,,
-,,.,,,9,,,,,,,,,9,,,,,
+
 
 message Level 2: Go to Wob Town
 
@@ -1313,31 +1441,7 @@ message Level 2: Go to Wob Town
 message Welcome to Wob Town!
 
 ( Wob Town )
-........................
-,,,,,,,,,,,#####,,,,,,,,
-,,..,,,###,##'######,,,,
-,,,..,#¡¡2###‡¡¡¡¡¡…#,..
-,,,,,,#¡¡¡#¡¡¡¡¡¡¡¡¡#..,
-,,..,#/‡¡¡#¡¡¡¡¡¡‡¡¡#,,,
-,..,,,#¡¡¡#¡¡¡¡¡¡¡¡¡##,,
-,#####,#„#,#¡¡¡##„##¡¡#,
-#¡¡¡¡¡#,@,,,###,,@,#†¡#,
-#¡¡#†¡„@@@@@@@@@@@@„¡¡#.
-#¡¡¡¡¡#,..,..,,?,@,####,
-#¡#¡#¡#..,,,..,..@,#¡/¡#
-#¡¡¡¡¡#,,,?..,..,@@„¡¡¡#
-,##¡##..,..,,..,,@,#¡¡2#
-#3¡¡¡¡#,&{..,,###„#,###,
-#¡¡¡¡¡¡#_},,,#¡¡¡¡¡#,,,,
-#¡¡¡¡¡¡¡######¡#†/¡#,,,,
-#¡¡¡¡¡¡¡#..,,#¡¡¡¡¡#,,,,
-,##„####,,,,,,#####,,,,,
-,,,.,,.,,.,,.,,.,,.,,.,,
-wob.town,,,,,,,,,,,,,,,,
-,,..,,,,,..,,,..,,,..,,,
-,,,.,,,,,,,,,.,,,,..,,,,
-,,,.,,,,,..,..,,,,,,,,,,
-,,,+,,,,..,,.,,,,,,,,,,,
+
 
 
 message Level 3: Go to Winky City
